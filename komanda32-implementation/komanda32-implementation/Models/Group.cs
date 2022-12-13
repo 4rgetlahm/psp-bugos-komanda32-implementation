@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using System.Text.Json.Serialization;
 
 namespace komanda32_implementation.Models
 {
@@ -8,6 +9,7 @@ namespace komanda32_implementation.Models
         public string Name { get; set; }
         public string Description { get; set; }
         public Franchise Franchise { get; set; }
+        [JsonIgnore]
         public List<Worker> Workers { get; set; }
         public static void BuildModel(ModelBuilder modelBuilder)
         {

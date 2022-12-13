@@ -13,6 +13,7 @@ namespace komanda32_implementation.Database
         public virtual DbSet<Worker> Workers { get; set; }
         public virtual DbSet<Group> Groups { get; set; }
         public virtual DbSet<Franchise> Franchises { get; set; }
+        public virtual DbSet<Customer> Customers { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
