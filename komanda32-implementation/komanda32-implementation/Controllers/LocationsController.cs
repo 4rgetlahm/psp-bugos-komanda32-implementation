@@ -24,7 +24,7 @@ public class LocationsController : Controller
         if (location == null)
         {
             return NotFound();
-        }
+        }   
 
         location.Description = description;
         _dbContext.Groups.Update(location);

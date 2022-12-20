@@ -114,7 +114,7 @@ namespace komanda32_implementation.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ProductServices");
+                    b.ToTable("Services");
                 });
 
             modelBuilder.Entity("komanda32_implementation.Models.Shift", b =>

@@ -10,11 +10,11 @@ public class ServicesController : Controller
 {
     private readonly DataContext _dbContext;
 
-    public ServicesController(DataContext dbContext )
+    public ServicesController(DataContext dbContext)
     {
         _dbContext = dbContext;
     }
-    
+
     [HttpPost]
     [Route("services/create")]
     public async Task<IActionResult> CreateProduct([FromBody] Service product)
@@ -24,11 +24,11 @@ public class ServicesController : Controller
         await _dbContext.SaveChangesAsync();
         return Ok();
     }
-    
+
     [HttpPatch]
     [Route("services/{id}/update")]
     public async Task<IActionResult> UpdateProduct(int id, [FromBody] Service product)
-    {
+    {//?? does not work as expected
         // add check if current user can update product and is manager
         Service? productToUpdate = await _dbContext.Services.SingleOrDefaultAsync(p => p.Id == id);
         if (productToUpdate == null)
@@ -40,12 +40,11 @@ public class ServicesController : Controller
         await _dbContext.SaveChangesAsync();
         return Ok();
     }
-    
+
     [HttpGet]
     [Route("services/{id}")]
     public async Task<IActionResult> GetProduct(int id)
     {
-        // add check if current user can get product and is manager
         Service? product = await _dbContext.Services.SingleOrDefaultAsync(p => p.Id == id);
         if (product == null)
         {
@@ -54,16 +53,38 @@ public class ServicesController : Controller
 
         return Ok(product);
     }
-    
+
     [HttpGet]
     [Route("services")]
-    public async Task<IActionResult> GetProducts(int top, string continuationToken)
+    public async Task<ActionResult<ContinuationTokenResult<IEnumerable<Service>>>> GetProducts(int top, string? continuationToken = null)
     {
-        // add check if current user can get products and is manager
-        List<Service>? products = await _dbContext.Services.ToListAsync();
-        return Ok(products);
+        if (top > 1000)
+            return new BadRequestObjectResult("Top value cannot be greater than 1000");
+        if (top < 0)
+            return new BadRequestObjectResult("Top value cannot be negative");
+
+        List<Service> products;
+        int updatedContinuationTokenValue = top;
+        var valueBytes = Convert.FromBase64String(continuationToken ?? "");
+
+        if (int.TryParse(System.Text.Encoding.UTF8.GetString(valueBytes), out var decodedSkipValue))
+        {
+            products = await _dbContext.Services.Skip(decodedSkipValue).Take(top).ToListAsync();
+            updatedContinuationTokenValue += decodedSkipValue;
+        }
+        else
+        {
+            products = await _dbContext.Services.Take(top).ToListAsync();
+        }
+
+        var plainTextBytes = System.Text.Encoding.UTF8.GetBytes(updatedContinuationTokenValue.ToString());
+        return new ContinuationTokenResult<IEnumerable<Service>>
+        {
+            Response = products,
+            ContinuationToken = products.Count == top ? Convert.ToBase64String(plainTextBytes) : ""
+        };
     }
-    
+
     [HttpDelete]
     [Route("services/{id}/delete")]
     public async Task<IActionResult> DeleteProduct(int id)
@@ -78,5 +99,5 @@ public class ServicesController : Controller
         _dbContext.Services.Remove(product);
         await _dbContext.SaveChangesAsync();
         return Ok();
-    } 
+    }
 }

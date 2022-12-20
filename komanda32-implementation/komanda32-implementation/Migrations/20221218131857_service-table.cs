@@ -40,7 +40,7 @@ namespace komanda32_implementation.Migrations
                 oldType: "int");
 
             migrationBuilder.CreateTable(
-                name: "ProductServices",
+                name: "Services",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -62,7 +62,7 @@ namespace komanda32_implementation.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ProductServices", x => x.Id);
+                    table.PrimaryKey("PK_Services", x => x.Id);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
@@ -110,7 +110,7 @@ namespace komanda32_implementation.Migrations
                 table: "Workers");
 
             migrationBuilder.DropTable(
-                name: "ProductServices");
+                name: "Services");
 
             migrationBuilder.DropTable(
                 name: "Shifts");
