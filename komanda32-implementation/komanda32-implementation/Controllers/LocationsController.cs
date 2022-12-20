@@ -16,7 +16,7 @@ public class LocationsController : Controller
     }
 
     [HttpPatch]
-    [Route("location/{id}")]
+    [Route("location/{id}/update")]
     public async Task<IActionResult> UpdateLocationDescription (int id, string description) // as per now, havent found direct connection of user to the location
     {
         // add check if current user can update location description and is manager

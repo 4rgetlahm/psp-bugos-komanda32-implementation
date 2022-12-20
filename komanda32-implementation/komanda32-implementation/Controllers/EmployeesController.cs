@@ -1,5 +1,6 @@
 using komanda32_implementation.Database;
 using komanda32_implementation.Models;
+using komanda32_implementation.Models.Create;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,34 +11,64 @@ public class EmployeesController : Controller
 {
     private readonly DataContext _dbContext;
 
-    public EmployeesController(DataContext dbContext )
+    public EmployeesController(DataContext dbContext)
     {
         _dbContext = dbContext;
     }
-    
+
     [HttpPost]
     [Route("employee/create")]
-    public async Task<IActionResult> CreateEmployee([FromBody] Worker employee)
+    public async Task<IActionResult> CreateEmployee([FromBody] CreateWorker createWorkerModel)
     {
         // add check if current user can create employee and is manager
-        
-        employee.EmployeeCode = Guid.NewGuid().ToString();
-        await _dbContext.Workers.AddAsync(employee);
+        if (createWorkerModel == null)
+        {
+            return new BadRequestResult();
+        }
+
+        Worker worker = new Worker();
+        worker.EmployeeCode = Guid.NewGuid().ToString();
+        worker.Email = createWorkerModel.Email;
+        worker.Name = createWorkerModel.Name;
+        worker.Surname = createWorkerModel.Surname;
+        worker.PhoneNumber = createWorkerModel.PhoneNumber;
+        worker.Employment = createWorkerModel.Employment ?? 0;
+        worker.BankAccount = createWorkerModel.BankAccount;
+        worker.DateOfBirth = createWorkerModel.DateOfBirth ?? DateTime.MinValue;
+        worker.Address = createWorkerModel.Address;
+        worker.Type = createWorkerModel.Type ?? WorkerType.Cashier;
+
+        await _dbContext.Workers.AddAsync(worker);
         await _dbContext.SaveChangesAsync();
         return Ok();
     }
-    
+
     [HttpPatch]
     [Route("employee/update")]
-    public async Task<IActionResult> UpdateEmployee(int employeeId, [FromBody] Worker employee)
+    public async Task<IActionResult> UpdateEmployee(int employeeId, [FromBody] CreateWorker updateWorkerModel)
     {
         // add check if current user can update employee and is manager
-        Worker? employeeAccount = await _dbContext.Workers.SingleOrDefaultAsync(p=> p.Id == employeeId);
-        _dbContext.Workers.Update(employee);
+        var employeeAccount = await _dbContext.Workers.SingleOrDefaultAsync(p => p.Id == employeeId);
+        if (employeeAccount == null)
+        {
+            return NotFound();
+        }
+
+        employeeAccount.Email = updateWorkerModel.Email ?? employeeAccount.Email;
+        employeeAccount.Name = updateWorkerModel.Name ?? employeeAccount.Name;
+        employeeAccount.Surname = updateWorkerModel.Surname ?? employeeAccount.Surname;
+        employeeAccount.Employment = updateWorkerModel.Employment ?? employeeAccount.Employment;
+        employeeAccount.BankAccount = updateWorkerModel.BankAccount ?? employeeAccount.BankAccount;
+        employeeAccount.Type = updateWorkerModel.Type ?? employeeAccount.Type;
+        employeeAccount.Address = updateWorkerModel.Address ?? employeeAccount.Address;
+        employeeAccount.DateOfBirth = updateWorkerModel.DateOfBirth ?? employeeAccount.DateOfBirth;
+        employeeAccount.PhoneNumber = updateWorkerModel.PhoneNumber ?? employeeAccount.PhoneNumber;
+
+        _dbContext.Workers.Update(employeeAccount);
         await _dbContext.SaveChangesAsync();
         return Ok();
     }
-    
+
     [HttpDelete]
     [Route("employee/delete")]
     public async Task<IActionResult> DeleteEmployee(int employeeId)
@@ -53,7 +84,7 @@ public class EmployeesController : Controller
         await _dbContext.SaveChangesAsync();
         return Ok();
     }
-    
+
     [HttpPatch]
     [Route("employee/type/assign/{id}")]
     public async Task<IActionResult> AssignEmployeeType(int id, WorkerType workerType)
@@ -69,61 +100,5 @@ public class EmployeesController : Controller
         _dbContext.Workers.Update(employee);
         await _dbContext.SaveChangesAsync();
         return Ok();
-    }
-  
-    
-    [HttpPost]
-    [Route("employee/{id}/shift/create")]
-    public async Task<IActionResult> CreateShift(int id, [FromBody] Shift shift)
-    {
-        // add check if current user can create shift and is manager
-        Worker? employee = await _dbContext.Workers.SingleOrDefaultAsync(p => p.Id == id);
-        if (employee == null)
-        {
-            return NotFound();
-        }
-
-        shift.WorkerId = employee.Id;
-        await _dbContext.Shifts.AddAsync(shift);
-        await _dbContext.SaveChangesAsync();
-        return Ok();
-    }
-    
-    [HttpPatch]
-    [Route("employee/{id}/shift/update")]
-    public async Task<IActionResult> UpdateShift(int id, [FromBody] Shift shift)
-    {
-        // add check if current user can update shift and is manager
-        Worker? employee = await _dbContext.Workers.SingleOrDefaultAsync(p => p.Id == id);
-        if (employee == null)
-        {
-            return NotFound();
-        }
-
-        _dbContext.Shifts.Update(shift);
-        await _dbContext.SaveChangesAsync();
-        return Ok();
-    }
-    
-    [HttpDelete]
-    [Route("employee/{id}/shift/delete")]
-    public async Task<IActionResult> DeleteShift(int id, int shiftId)
-    {
-        // add check if current user can delete shift and is manager
-        Worker? employee = await _dbContext.Workers.SingleOrDefaultAsync(p => p.Id == id);
-        if (employee == null)
-        {
-            return NotFound();
-        }
-
-        Shift? shift = await _dbContext.Shifts.SingleOrDefaultAsync(p => p.ShiftId == shiftId);
-        if (shift == null)
-        {
-            return NotFound();
-        }
-
-        _dbContext.Shifts.Remove(shift);
-        await _dbContext.SaveChangesAsync();
-        return Ok();
-    }
+    } 
 }
