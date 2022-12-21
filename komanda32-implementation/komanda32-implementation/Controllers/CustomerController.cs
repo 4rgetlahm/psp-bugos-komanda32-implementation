@@ -2,6 +2,8 @@
 using komanda32_implementation.Models;
 using komanda32_implementation.Models.Create;
 using komanda32_implementation.Models.Update;
+using komanda32_implementation.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Cryptography;
@@ -41,7 +43,7 @@ namespace komanda32_implementation.Controllers
                 return BadRequest(new ErrorResponse("Customer already exists"));
             }
 
-            customer = new Customer(createCustomerModel.Username, GetHash(createCustomerModel.Password), createCustomerModel.Email);
+            customer = new Customer(createCustomerModel.Username, Authentication.Instance.GetHash(createCustomerModel.Password), createCustomerModel.Email);
             customer.Franchise = franchise;
 
             _dataContext.Customers.Add(customer);
@@ -51,6 +53,7 @@ namespace komanda32_implementation.Controllers
         }
 
         [HttpGet]
+        [Authorize]
         [Route("{id}")]
         public async Task<IActionResult> GetCustomerByIdAsync(int id, CancellationToken cancellationToken)
         {
@@ -94,7 +97,7 @@ namespace komanda32_implementation.Controllers
 
             customer.Username = updateCustomerModel.Username ?? customer.Username;
             customer.Email = updateCustomerModel.Email ?? customer.Email;
-            customer.Password = updateCustomerModel.Password != null ? GetHash(updateCustomerModel.Password) : customer.Password;
+            customer.Password = updateCustomerModel.Password != null ? Authentication.Instance.GetHash(updateCustomerModel.Password) : customer.Password;
             customer.Name = updateCustomerModel.Name ?? customer.Name;
             customer.Surname = updateCustomerModel.Surname ?? customer.Surname;
             customer.DeliveryAddress = updateCustomerModel.DeliveryAddress ?? customer.DeliveryAddress;
@@ -122,22 +125,6 @@ namespace komanda32_implementation.Controllers
             _dataContext.SaveChanges();
 
             return Ok();
-        }
-
-        private string GetHash(string input)
-        {
-            using (SHA256 sha256Hash = SHA256.Create())
-            {
-                byte[] data = sha256Hash.ComputeHash(Encoding.UTF8.GetBytes(input));
-
-                StringBuilder sBuilder = new StringBuilder();
-                for (int i = 0; i < data.Length; i++)
-                {
-                    sBuilder.Append(data[i].ToString("x2"));
-                }
-
-                return sBuilder.ToString();
-            }
         }
     }
 }

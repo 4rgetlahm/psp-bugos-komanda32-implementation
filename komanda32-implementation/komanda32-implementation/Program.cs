@@ -1,6 +1,9 @@
 using komanda32_implementation.Database;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Serilog;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,7 +18,29 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddDbContext<DataContext>();
 
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidIssuer = Environment.GetEnvironmentVariable("ISSUER"),
+
+            ValidateAudience = true,
+            ValidAudience = Environment.GetEnvironmentVariable("AUDIENCE"),
+
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("JWT_KEY") ?? "")),
+
+            RequireExpirationTime = true,
+            ValidateLifetime = true,
+            RequireSignedTokens = true
+        }
+    );
+
 var app = builder.Build();
+
+app.UseAuthentication();
+app.UseAuthorization();
 
 Log.Logger = new LoggerConfiguration()
             .MinimumLevel.Override("Microsoft.EntityFrameworkCore.Database.Command", Serilog.Events.LogEventLevel.Warning)

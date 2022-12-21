@@ -20,7 +20,10 @@
         "SQL_SERVER": "localhost",
         "SQL_DATABASE": "komanda32-implementation",
         "SQL_USER": "root",
-        "SQL_PASS": "dbpass"
+        "SQL_PASS": "dbpass",
+        "ISSUER": "https://this.system.com",
+        "AUDIENCE": "https://this.system.com",
+        "JWT_KEY": "SuperSecretKeyThatShouldntBeInGit"
       }
     },
     "IIS Express": {

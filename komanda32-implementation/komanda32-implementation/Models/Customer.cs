@@ -2,7 +2,7 @@
 
 namespace komanda32_implementation.Models
 {
-    public record Customer
+    public record Customer : IAuthenticatable
     {
         public int Id { get; set; }
         public string Username { get; set; }
