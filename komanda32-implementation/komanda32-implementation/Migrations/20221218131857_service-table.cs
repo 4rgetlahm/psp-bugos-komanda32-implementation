@@ -45,12 +45,12 @@ namespace komanda32_implementation.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    isProduct = table.Column<bool>(type: "tinyint(1)", nullable: false),
+                    IsProduct = table.Column<bool>(type: "tinyint(1)", nullable: false),
                     Name = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Price = table.Column<decimal>(type: "decimal(65,30)", nullable: false),
                     FranciseId = table.Column<int>(type: "int", nullable: false),
-                    PriceBeforeTaxe = table.Column<decimal>(type: "decimal(65,30)", nullable: false),
+                    PriceBeforeTaxes = table.Column<decimal>(type: "decimal(65,30)", nullable: false),
                     TaxeId = table.Column<int>(type: "int", nullable: false),
                     Size = table.Column<int>(type: "int", nullable: false),
                     Category = table.Column<int>(type: "int", nullable: false),

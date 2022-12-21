@@ -1,5 +1,6 @@
 using komanda32_implementation.Database;
 using komanda32_implementation.Models;
+using komanda32_implementation.Models.Update;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -27,14 +28,27 @@ public class ServicesController : Controller
 
     [HttpPatch]
     [Route("services/{id}/update")]
-    public async Task<IActionResult> UpdateService(int id, [FromBody] Service product)
-    {//?? does not work as expected
+    public async Task<IActionResult> UpdateService(int id, [FromBody] UpdateService service)
+    {
         // add check if current user can update product and is manager
         Service? serviceToUpdate = await _dbContext.Services.SingleOrDefaultAsync(p => p.Id == id);
         if (serviceToUpdate == null)
             return NotFound();
 
-        _dbContext.Services.Update(product);
+        serviceToUpdate.IsProduct = service.IsProduct ?? serviceToUpdate.IsProduct;
+        serviceToUpdate.Name = service.Name ?? serviceToUpdate.Name;
+        serviceToUpdate.Price = service.Price ?? serviceToUpdate.Price;
+        serviceToUpdate.FranciseId = service.FranciseId ?? serviceToUpdate.FranciseId;
+        serviceToUpdate.PriceBeforeTaxes = service.PriceBeforeTaxes ?? serviceToUpdate.PriceBeforeTaxes;
+        serviceToUpdate.TaxeId = service.TaxeId ?? serviceToUpdate.TaxeId;
+        serviceToUpdate.Size = service.Size ?? serviceToUpdate.Size;
+        serviceToUpdate.Category = service.Category ?? serviceToUpdate.Category;
+        serviceToUpdate.WorkerId = service.WorkerId ?? serviceToUpdate.WorkerId;
+        serviceToUpdate.Time = service.Time ?? serviceToUpdate.Time;
+        serviceToUpdate.ReservationTime = service.ReservationTime ?? serviceToUpdate.ReservationTime;
+        serviceToUpdate.Discount = service.Discount ?? serviceToUpdate.Discount;
+        serviceToUpdate.DiscountType = service.DiscountType ?? serviceToUpdate.DiscountType;
+        _dbContext.Services.Update(serviceToUpdate);
         await _dbContext.SaveChangesAsync();
         return Ok();
     }

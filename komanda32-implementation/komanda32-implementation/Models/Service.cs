@@ -3,11 +3,11 @@ namespace komanda32_implementation.Models;
 public class Service
 {
     public int Id { get; set; }
-    public bool isProduct { get; set; }
+    public bool IsProduct { get; set; }
     public string Name { get; set; }
     public decimal Price { get; set; }
     public int FranciseId { get; set; }
-    public decimal PriceBeforeTaxe { get; set; }
+    public decimal PriceBeforeTaxes { get; set; }
     public int TaxeId { get; set; }
     public int Size { get; set; }
     public int Category { get; set; }

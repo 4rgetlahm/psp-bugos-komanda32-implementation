@@ -1,6 +1,7 @@
 using komanda32_implementation.Database;
 using komanda32_implementation.Models;
 using komanda32_implementation.Models.Create;
+using komanda32_implementation.Models.Update;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -43,7 +44,7 @@ public class EmployeesController : Controller
 
     [HttpPatch]
     [Route("employee/update")]
-    public async Task<IActionResult> UpdateEmployee(int employeeId, [FromBody] CreateWorker updateWorkerModel)
+    public async Task<IActionResult> UpdateEmployee(int employeeId, [FromBody] UpdateWorker updateWorkerModel)
     {
         // add check if current user can update employee and is manager
         var employeeAccount = await _dbContext.Workers.SingleOrDefaultAsync(p => p.Id == employeeId);
@@ -92,5 +93,5 @@ public class EmployeesController : Controller
         _dbContext.Workers.Update(employee);
         await _dbContext.SaveChangesAsync();
         return Ok();
-    } 
+    }
 }
