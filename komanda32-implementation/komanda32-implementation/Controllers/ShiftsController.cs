@@ -43,13 +43,10 @@ public class ShiftsController : Controller
     [Route("employee/{id}/shift/update")]
     public async Task<IActionResult> UpdateShift([FromBody] UpdateShift updateShiftModel)
     {
-
         // add check if current user can update shift and is manager
         Worker? employee = await _dbContext.Workers.SingleOrDefaultAsync(p => p.Id == updateShiftModel.WorkerId);
         if (employee == null)
-        {
             return NotFound();
-        }
 
         Shift shift = new Shift();
         shift.WorkerId = updateShiftModel.WorkerId ?? shift.WorkerId;
@@ -70,9 +67,7 @@ public class ShiftsController : Controller
         // add check if current user can delete shift and is manager
         Shift? shift = await _dbContext.Shifts.SingleOrDefaultAsync(p => p.ShiftId == shiftId);
         if (shift == null)
-        {
             return NotFound();
-        }
 
         _dbContext.Shifts.Remove(shift);
         await _dbContext.SaveChangesAsync();

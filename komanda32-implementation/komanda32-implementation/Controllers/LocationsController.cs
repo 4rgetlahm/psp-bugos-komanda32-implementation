@@ -22,9 +22,7 @@ public class LocationsController : Controller
         // add check if current user can update location description and is manager
         Group? location = await _dbContext.Groups.SingleOrDefaultAsync(p => p.Id == id);
         if (location == null)
-        {
-            return NotFound();
-        }   
+            return NotFound();   
 
         location.Description = description;
         _dbContext.Groups.Update(location);

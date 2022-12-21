@@ -22,9 +22,7 @@ public class EmployeesController : Controller
     {
         // add check if current user can create employee and is manager
         if (createWorkerModel == null)
-        {
             return new BadRequestResult();
-        }
 
         Worker worker = new Worker();
         worker.EmployeeCode = Guid.NewGuid().ToString();
@@ -50,9 +48,7 @@ public class EmployeesController : Controller
         // add check if current user can update employee and is manager
         var employeeAccount = await _dbContext.Workers.SingleOrDefaultAsync(p => p.Id == employeeId);
         if (employeeAccount == null)
-        {
             return NotFound();
-        }
 
         employeeAccount.Email = updateWorkerModel.Email ?? employeeAccount.Email;
         employeeAccount.Name = updateWorkerModel.Name ?? employeeAccount.Name;
@@ -76,9 +72,7 @@ public class EmployeesController : Controller
         // add check if current user can delete employee and is manager
         Worker? employee = await _dbContext.Workers.SingleOrDefaultAsync(p => p.Id == employeeId);
         if (employee == null)
-        {
             return NotFound();
-        }
 
         _dbContext.Workers.Remove(employee);
         await _dbContext.SaveChangesAsync();
@@ -92,9 +86,7 @@ public class EmployeesController : Controller
         // add check if current user can assign employee type and is manager
         Worker? employee = await _dbContext.Workers.SingleOrDefaultAsync(p => p.Id == id);
         if (employee == null)
-        {
             return NotFound();
-        }
 
         employee.Type = workerType;
         _dbContext.Workers.Update(employee);
